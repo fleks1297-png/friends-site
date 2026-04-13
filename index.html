@@ -13,6 +13,7 @@ body {
   display: flex;
 }
 
+/* SIDEBAR */
 .sidebar {
   width: 220px;
   background: #e6dcff;
@@ -39,6 +40,7 @@ body {
   background: #dcd0ff;
 }
 
+/* CONTENT */
 .content {
   flex: 1;
   display: flex;
@@ -54,6 +56,7 @@ body {
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   max-width: 600px;
+  width: 100%;
   animation: fadeIn 0.6s ease;
 }
 
@@ -71,6 +74,48 @@ body {
 .text {
   font-size: 16px;
   line-height: 1.6;
+}
+
+/* 📱 MOBILE VERSION */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .sidebar h2 {
+    display: none;
+  }
+
+  .tab {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .text {
+    font-size: 14px;
+  }
 }
 </style>
 </head>

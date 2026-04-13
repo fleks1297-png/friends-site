@@ -13,18 +13,11 @@ body {
   display: flex;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: 220px;
   background: #e6dcff;
   padding: 20px;
   height: 100vh;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-}
-
-.sidebar h2 {
-  font-size: 18px;
-  margin-bottom: 20px;
 }
 
 .tab {
@@ -33,182 +26,129 @@ body {
   background: #f3efff;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-.tab:hover {
-  background: #dcd0ff;
-}
-
-/* CONTENT */
 .content {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  padding: 40px;
+  padding: 20px;
 }
 
 .card {
   background: white;
-  padding: 40px;
+  padding: 20px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   max-width: 600px;
   width: 100%;
-  animation: fadeIn 0.6s ease;
 }
 
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(20px);} 
-  to {opacity: 1; transform: translateY(0);} 
+.title { font-size: 24px; margin-bottom: 10px; }
+
+.chat-box {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background: #fafafa;
 }
 
-.title {
-  font-size: 32px;
-  margin-bottom: 20px;
-  color: #6a5acd;
+.message {
+  margin-bottom: 8px;
 }
 
-.text {
-  font-size: 16px;
-  line-height: 1.6;
+select, input, button {
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
-/* 📱 MOBILE VERSION */
-@media (max-width: 768px) {
-  body {
-    flex-direction: column;
-  }
+button { cursor: pointer; }
 
-  .sidebar {
-    width: 100%;
-    height: auto;
-    display: flex;
-    overflow-x: auto;
-    gap: 10px;
-    padding: 10px;
-  }
-
-  .sidebar h2 {
-    display: none;
-  }
-
-  .tab {
-    flex: 1;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .content {
-    padding: 20px;
-  }
-
-  .card {
-    padding: 20px;
-  }
-
-  .title {
-    font-size: 24px;
-  }
-
-  .text {
-    font-size: 14px;
-  }
+/* mobile */
+@media (max-width:768px) {
+  body { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; display: flex; gap: 5px; overflow-x: auto; }
+  .tab { flex: 1; text-align: center; }
 }
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-  <h2>Кенты</h2>
   <div class="tab" onclick="showContent('main')">История</div>
   <div class="tab" onclick="showContent('lexa')">Лёха</div>
   <div class="tab" onclick="showContent('vlad')">Влад</div>
   <div class="tab" onclick="showContent('berkut')">Беркут</div>
   <div class="tab" onclick="showContent('sergey')">Серега</div>
+  <div class="tab" onclick="showContent('chat')">💬 Чат</div>
 </div>
 
-<div class="content" id="content">
-  <div class="card">
-    <div class="title">История кентов</div>
-    <div class="text">
-      Всё началось много лет назад, когда судьба решила свести вместе абсолютно разных людей. 
-      Кто-то пришёл из дворов, кто-то из школы, кто-то вообще появился случайно... 
-      Но со временем всё это превратилось в крепкую дружбу.
-      <br><br>
-      Здесь нет случайных людей — только проверенные временем кенты.
-    </div>
-  </div>
-</div>
+<div class="content" id="content"></div>
 
 <script>
+let messages = [];
+
 function showContent(name) {
   const content = document.getElementById('content');
-  let html = '';
 
-  if (name === 'lexa') {
-    html = `
+  if (name === 'chat') {
+    content.innerHTML = `
       <div class="card">
-        <div class="title">Лёха</div>
-        <div class="text">
-          Лёха родился в обычном районе, где с детства научился стоять за себя.
-          Всегда отличался спокойствием и умением решать любые вопросы.
-          Сейчас занимается своими делами, но всегда на связи с кентами.
-        </div>
+        <div class="title">Общий чат</div>
+        <div class="chat-box" id="chatBox"></div>
+        <select id="user">
+          <option>Лёха</option>
+          <option>Влад</option>
+          <option>Беркут</option>
+          <option>Серега</option>
+        </select><br>
+        <input id="msg" placeholder="Сообщение..." />
+        <button onclick="sendMessage()">Отправить</button>
       </div>`;
+      renderMessages();
+      return;
   }
 
-  if (name === 'vlad') {
-    html = `
-      <div class="card">
-        <div class="title">Влад</div>
-        <div class="text">
-          Влад — стратег компании. Всегда думает на шаг вперёд.
-          Родился в городе, но быстро понял, как устроена жизнь.
-          Любит технику, идеи и разговоры до ночи.
-        </div>
-      </div>`;
-  }
+  const texts = {
+    main: 'История кентов началась давно...',
+    lexa: 'Лёха — спокойный и надежный.',
+    vlad: 'Влад — стратег и мыслитель.',
+    berkut: 'Беркут — энергия компании.',
+    sergey: 'Серега — душа компании.'
+  };
 
-  if (name === 'berkut') {
-    html = `
-      <div class="card">
-        <div class="title">Беркут</div>
-        <div class="text">
-          Беркут получил своё прозвище не просто так.
-          Быстрый, резкий и всегда готов к движу.
-          Его энергия заряжает всех вокруг.
-        </div>
-      </div>`;
-  }
-
-  if (name === 'sergey') {
-    html = `
-      <div class="card">
-        <div class="title">Серега</div>
-        <div class="text">
-          Серега — душа компании. Где он — там смех.
-          Всегда поддержит, подколет и поднимет настроение.
-          Без него эта история была бы совсем другой.
-        </div>
-      </div>`;
-  }
-
-  if (name === 'main') {
-    html = `
-      <div class="card">
-        <div class="title">История кентов</div>
-        <div class="text">
-          Всё началось много лет назад, когда судьба решила свести вместе абсолютно разных людей.
-          Но именно это и сделало дружбу крепкой.
-        </div>
-      </div>`;
-  }
-
-  content.innerHTML = html;
+  content.innerHTML = `
+    <div class="card">
+      <div class="title">${name}</div>
+      <div>${texts[name]}</div>
+    </div>`;
 }
+
+function sendMessage() {
+  const user = document.getElementById('user').value;
+  const msg = document.getElementById('msg').value;
+  if (!msg) return;
+
+  messages.push({user, msg});
+  document.getElementById('msg').value = '';
+  renderMessages();
+}
+
+function renderMessages() {
+  const box = document.getElementById('chatBox');
+  if (!box) return;
+
+  box.innerHTML = messages.map(m => `
+    <div class="message"><b>${m.user}:</b> ${m.msg}</div>
+  `).join('');
+}
+
+showContent('main');
 </script>
 
 </body>
